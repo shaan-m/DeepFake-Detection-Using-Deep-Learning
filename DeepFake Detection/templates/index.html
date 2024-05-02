@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deepfake Detection</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(45deg, #8e2de2, #4a00e0);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #fff;
+        }
+
+        .container {
+            text-align: center;
+            padding: 20px;
+            border-radius: 10px;
+            background-color: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+        }
+
+        #image-preview {
+            display: none;
+            width: 200px;
+            margin: 20px auto;
+            border-radius: 5px;
+        }
+
+        .upload-btn {
+            background-color: #ff0066;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+
+        .upload-btn:hover {
+            background-color: #cc0052;
+        }
+
+        .predict-btn {
+            background-color: #4caf50;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+
+        .predict-btn:hover {
+            background-color: #45a049;
+        }
+
+        .result {
+            margin-top: 20px;
+            font-size: 20px;
+            opacity: 0;
+            animation: fadeIn 0.5s forwards;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Deepfake Detection</h1>
+        <form id="upload-form" enctype="multipart/form-data">
+            <input type="file" id="file-input" name="image" style="display: none;">
+            <button type="button" class="upload-btn" onclick="document.getElementById('file-input').click();">Upload Image</button>
+        </form>
+        <img id="image-preview" src="#" alt="Image Preview">
+        <button type="button" class="predict-btn" onclick="predict()">Predict</button>
+        <p id="result" class="result"></p>
+    </div>
+
+    <script>
+        function previewImage(input) {
+            var preview = document.getElementById('image-preview');
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function (e) {
+                    preview.src = e.target.result;
+                };
+                reader.readAsDataURL(input.files[0]);
+                preview.style.display = 'block';
+            }
+        }
+
+        document.getElementById('file-input').addEventListener('change', function() {
+            previewImage(this);
+        });
+
+        function predict() {
+            var form = document.getElementById('upload-form');
+            var formData = new FormData(form);
+
+            fetch('/predict', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.text())
+            .then(result => {
+                var resultElement = document.getElementById('result');
+                resultElement.innerText = result;
+                resultElement.style.opacity = 1;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+    </script>
+</body>
+</html>
